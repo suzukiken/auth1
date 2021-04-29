@@ -11,6 +11,19 @@
     "@aws-cdk/aws-s3:grantWriteWithoutAcl": true,
     "@aws-cdk/aws-ecs-patterns:removeDefaultDesiredCount": true,
     "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
-    "@aws-cdk/aws-efs:defaultEncryptionAtRest": true
+    "@aws-cdk/aws-efs:defaultEncryptionAtRest": true,
+    "basename": "auth1",
+    "_comment_1": "---------for input-----------",
+    "googleauth_smsecretname": "googleauth",
+    "cognito_userpool_domain_prefix_ssmparamname": "/auth1/cognito/userpool/domainprefix",
+    "cognito_userpool_appclient_callbackurls_ssmparamname": "/auth1/cognito/userpool/appclient/callbackurls",
+    "cognito_userpool_appclient_sighouturls_ssmparamname": "/auth1/cognito/userpool/appclient/sighouturls",
+    "cognito_userpool_signuptrigger_allowedemails_ssmparamname": "/auth1/cognito/userpool/signuptrigger/allowedemails",
+    "cognito_userpool_signuptrigger_alloweddomains_ssmparamname": "/auth1/cognito/userpool/signuptrigger/alloweddomains",
+    "_comment_2": "---------for outout---------",
+    "cognito_idpool_id_ssmparamname": "/auth1/cognito/idpool/id",
+    "cognito_userpool_id_ssmparamname": "/auth1/cognito/userpool/id",
+    "cognito_userpool_webclient_id_ssmparamname": "/auth1/cognito/userpool/appclient/web/id",
+    "cognito_userpool_cloudfrontdomainname_ssmparamname": "/auth1/cognito/userpool/cloudfrontdomainname"
   }
 }
