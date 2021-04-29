@@ -24,6 +24,10 @@
     "cognito_idpool_id_ssmparamname": "/auth1/cognito/idpool/id",
     "cognito_userpool_id_ssmparamname": "/auth1/cognito/userpool/id",
     "cognito_userpool_webclient_id_ssmparamname": "/auth1/cognito/userpool/appclient/web/id",
-    "cognito_userpool_cloudfrontdomainname_ssmparamname": "/auth1/cognito/userpool/cloudfrontdomainname"
+    "cognito_userpool_cloudfrontdomainname_ssmparamname": "/auth1/cognito/userpool/cloudfrontdomainname",
+    "cognito_idpool_id_exportname": "auth1-cognito-idpool-id",
+    "cognito_userpool_id_exportname": "auth1-cognito-userpool-id",
+    "cognito_userpool_webclient_id_exportname": "auth1-cognito-userpool-webclient-id",
+    "cognito_userpool_domainname_exportname": "auth1-cognito-userpool-domainname"
   }
 }

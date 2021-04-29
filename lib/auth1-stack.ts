@@ -238,6 +238,22 @@ export class Auth1Stack extends cdk.Stack {
       parameterName: this.node.tryGetContext('cognito_userpool_cloudfrontdomainname_ssmparamname'),
       stringValue: userpool_domain.cloudFrontDomainName,
     })
+    
+    new cdk.CfnOutput(this, 'idpoolid', {
+      exportName: this.node.tryGetContext('cognito_idpool_id_exportname'), 
+      value: id_pool.ref
+    })
+    new cdk.CfnOutput(this, 'userpoolid', {
+      exportName: this.node.tryGetContext('cognito_userpool_id_exportname'), 
+      value: user_pool.userPoolId
+    })
+    new cdk.CfnOutput(this, 'webclientid', {
+      exportName: this.node.tryGetContext('cognito_userpool_webclient_id_exportname'), 
+      value: user_pool_client_web.userPoolClientId
+    })
+    new cdk.CfnOutput(this, 'domainname', {
+      exportName: this.node.tryGetContext('cognito_userpool_domainname_exportname'), 
+      value: userpool_domain.domainName
+    })
   }
 }
-
