@@ -15,7 +15,11 @@
     "basename": "auth1",
     "_comment_1": "---------for input-----------",
     "googleauth_smsecretname": "googleauth",
-    "cognito_userpool_domain_prefix_ssmparamname": "/auth1/cognito/userpool/domainprefix",
+    "hostedzoneid_exportname": "figmentresearch-hostedzoneid",
+    "notrhvirginia_acmarn_exportname": "figmentresearch-wildcard-notrhvirginia-acmarn",
+    "cognito_userpool_domainname_ssmparamname": "/auth1/cognito/userpool/domainname",
+    "cognito_userpool_subdomainname_ssmparamname": "/auth1/cognito/userpool/subdomainname",
+    "cognito_userpool_fqdn_ssmparamname": "/auth1/cognito/userpool/fqdn",
     "cognito_userpool_appclient_callbackurls_ssmparamname": "/auth1/cognito/userpool/appclient/callbackurls",
     "cognito_userpool_appclient_sighouturls_ssmparamname": "/auth1/cognito/userpool/appclient/sighouturls",
     "cognito_userpool_signuptrigger_allowedemails_ssmparamname": "/auth1/cognito/userpool/signuptrigger/allowedemails",
@@ -24,10 +28,9 @@
     "cognito_idpool_id_ssmparamname": "/auth1/cognito/idpool/id",
     "cognito_userpool_id_ssmparamname": "/auth1/cognito/userpool/id",
     "cognito_userpool_webclient_id_ssmparamname": "/auth1/cognito/userpool/appclient/web/id",
-    "cognito_userpool_cloudfrontdomainname_ssmparamname": "/auth1/cognito/userpool/cloudfrontdomainname",
     "cognito_idpool_id_exportname": "auth1-cognito-idpool-id",
     "cognito_userpool_id_exportname": "auth1-cognito-userpool-id",
     "cognito_userpool_webclient_id_exportname": "auth1-cognito-userpool-webclient-id",
-    "cognito_userpool_domainname_exportname": "auth1-cognito-userpool-domainname"
+    "cognito_userpool_fqdn_exportname": "auth1-cognito-userpool-fqdn"
   }
 }

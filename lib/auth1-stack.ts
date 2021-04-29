@@ -4,6 +4,9 @@ import * as iam from "@aws-cdk/aws-iam";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as ssm from "@aws-cdk/aws-ssm";
 import * as sm from "@aws-cdk/aws-secretsmanager";
+import * as acm from '@aws-cdk/aws-certificatemanager'
+import * as route53 from '@aws-cdk/aws-route53'
+import * as targets from "@aws-cdk/aws-route53-targets/lib";
 
 export class Auth1Stack extends cdk.Stack {
   
@@ -40,26 +43,43 @@ export class Auth1Stack extends cdk.Stack {
     しかしそれがなぜこうした結果になるのか理由は知らない。
     fromStringParameterName: Imports an external string parameter by name.
     valueForStringParameter: Returns a token that will resolve (during deployment)...
+    
+    実際のところvalueForStringParameterを使い始めて感じたのはSSMのパラメータを
+    削除してしまったりすると厄介だということだ。これは必要に応じて
     */
     
-    const COGNITO_CALLBACK_URLS = ssm.StringParameter.valueForStringParameter(this, 
+    const COGNITO_CALLBACK_URLS = ssm.StringParameter.valueFromLookup(this, 
       this.node.tryGetContext('cognito_userpool_appclient_callbackurls_ssmparamname')
     )
     
-    const COGNITO_LOGIN_URLS = ssm.StringParameter.valueForStringParameter(this, 
+    const COGNITO_LOGIN_URLS = ssm.StringParameter.valueFromLookup(this, 
       this.node.tryGetContext('cognito_userpool_appclient_sighouturls_ssmparamname')
     )
 
-    const COGNITO_DOMAIN_PREFIX = ssm.StringParameter.valueForStringParameter(this, 
-      this.node.tryGetContext('cognito_userpool_domain_prefix_ssmparamname')
-    )
-    
-    const ALLOWED_EMAILS = ssm.StringParameter.valueForStringParameter(this, 
+    const ALLOWED_EMAILS = ssm.StringParameter.valueFromLookup(this, 
       this.node.tryGetContext('cognito_userpool_signuptrigger_allowedemails_ssmparamname')
     )
     
-    const ALLOWED_DOMAINS = ssm.StringParameter.valueForStringParameter(this, 
+    const ALLOWED_DOMAINS = ssm.StringParameter.valueFromLookup(this, 
       this.node.tryGetContext('cognito_userpool_signuptrigger_alloweddomains_ssmparamname')
+    )
+    
+    const DOMAINNAME = ssm.StringParameter.valueFromLookup(this, 
+      this.node.tryGetContext('cognito_userpool_domainname_ssmparamname')
+    )
+    
+    const SUBDOMAINNAME = ssm.StringParameter.valueFromLookup(this, 
+      this.node.tryGetContext('cognito_userpool_subdomainname_ssmparamname')
+    )
+    
+    const FQDN = ssm.StringParameter.valueFromLookup(this, 
+      this.node.tryGetContext('cognito_userpool_fqdn_ssmparamname')
+    )
+    
+    const HOSTEDZONEID = cdk.Fn.importValue(this.node.tryGetContext('hostedzoneid_exportname'))
+ 
+    const ACMARN = acm.Certificate.fromCertificateArn(this, 'acmarn', 
+      cdk.Fn.importValue(this.node.tryGetContext('notrhvirginia_acmarn_exportname'))
     )
 
     // Lambda Sign Up Trigger
@@ -99,14 +119,31 @@ export class Auth1Stack extends cdk.Stack {
     );
 
     // Cognito User Pool Settings
-
+    
+    // よくわからないのだが、ネイキッドドメインに何らかの（何でもいいと思うのだがAレコードが必要）
+    // そうでないとcdk deploy時にこんなエラーが出る。
+    // Custom domain is not a valid subdomain: Was not able to resolve the root domain, please ensure an A record exists for the root domain.
+    // とりあえずAレコードはこれのためだけに手で作った。（このcdkでデプロイしていない）
+    
     const userpool_domain = new cognito.UserPoolDomain(this, "user_pool_domain", {
-      cognitoDomain: {
-        domainPrefix: COGNITO_DOMAIN_PREFIX,
-      },
       userPool: user_pool,
-    });
-
+      customDomain: {
+        domainName: FQDN,
+        certificate: ACMARN
+      }
+    })
+    
+    const zone = route53.HostedZone.fromHostedZoneAttributes(this, "zone", {
+      hostedZoneId: HOSTEDZONEID,
+      zoneName: DOMAINNAME
+    })
+    
+    const record = new route53.ARecord(this, 'record', {
+      zone: zone,
+      recordName: SUBDOMAINNAME,
+      target: route53.RecordTarget.fromAlias(new targets.UserPoolDomainTarget(userpool_domain)),
+    })
+    
     const oauth_settings = {
       callbackUrls: cdk.Fn.split(",", COGNITO_CALLBACK_URLS),
       logoutUrls: cdk.Fn.split(",", COGNITO_LOGIN_URLS),
@@ -234,11 +271,6 @@ export class Auth1Stack extends cdk.Stack {
       stringValue: user_pool_client_web.userPoolClientId,
     })
     
-    new ssm.StringParameter(this, 'cognito_userpool_cloudfrontdomainname_ssmparamname', {
-      parameterName: this.node.tryGetContext('cognito_userpool_cloudfrontdomainname_ssmparamname'),
-      stringValue: userpool_domain.cloudFrontDomainName,
-    })
-    
     new cdk.CfnOutput(this, 'idpoolid', {
       exportName: this.node.tryGetContext('cognito_idpool_id_exportname'), 
       value: id_pool.ref
@@ -252,7 +284,7 @@ export class Auth1Stack extends cdk.Stack {
       value: user_pool_client_web.userPoolClientId
     })
     new cdk.CfnOutput(this, 'domainname', {
-      exportName: this.node.tryGetContext('cognito_userpool_domainname_exportname'), 
+      exportName: this.node.tryGetContext('cognito_userpool_fqdn_exportname'), 
       value: userpool_domain.domainName
     })
   }
