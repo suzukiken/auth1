@@ -287,5 +287,13 @@ export class Auth1Stack extends cdk.Stack {
       exportName: this.node.tryGetContext('cognito_userpool_fqdn_exportname'), 
       value: userpool_domain.domainName
     })
+    new cdk.CfnOutput(this, 'auth_iamrolearn', {
+      exportName: this.node.tryGetContext('cognito_idpool_auth_iamrolearn_exportname'), 
+      value: iam_authenticated_role.roleArn
+    })
+    new cdk.CfnOutput(this, 'unauth_iamrolearn', {
+      exportName: this.node.tryGetContext('cognito_idpool_unauth_iamrolearn_exportname'), 
+      value: iam_unauthenticated_role.roleArn
+    })
   }
 }
