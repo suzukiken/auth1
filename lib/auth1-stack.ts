@@ -174,6 +174,19 @@ export class Auth1Stack extends cdk.Stack {
       }
     );
     
+    const user_pool_client_web_forlocal = new cognito.UserPoolClient(
+      this,
+      "user_pool_client_web_forlocal",
+      {
+        userPool: user_pool,
+        generateSecret: false,
+        supportedIdentityProviders: [
+          cognito.UserPoolClientIdentityProvider.GOOGLE,
+        ],
+        oAuth: oauth_settings,
+      }
+    );
+    
     const user_pool_client_native = new cognito.UserPoolClient(
       this,
       "user_pool_client_native",
@@ -191,6 +204,7 @@ export class Auth1Stack extends cdk.Stack {
     const google_idp_dependable = new cdk.ConcreteDependable();
     google_idp_dependable.add(google_idp);
     user_pool_client_web.node.addDependency(google_idp_dependable);
+    user_pool_client_web_forlocal.node.addDependency(google_idp_dependable);
     user_pool_client_native.node.addDependency(google_idp_dependable);
     
     // Cognito Id Pool
@@ -200,6 +214,11 @@ export class Auth1Stack extends cdk.Stack {
       cognitoIdentityProviders: [
         {
           clientId: user_pool_client_web.userPoolClientId,
+          providerName: user_pool.userPoolProviderName,
+          serverSideTokenCheck: false,
+        },
+        {
+          clientId: user_pool_client_web_forlocal.userPoolClientId,
           providerName: user_pool.userPoolProviderName,
           serverSideTokenCheck: false,
         },
